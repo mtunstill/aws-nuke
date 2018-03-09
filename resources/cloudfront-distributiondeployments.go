@@ -77,6 +77,13 @@ func (f *CloudFrontDistributionDeployment) Remove() error {
 	return err
 }
 
+func (f *CloudFrontDistributionDeployment) Filter() error {
+	if *f.distributionConfig.Enabled == false {
+		return fmt.Errorf("already disabled")
+	}
+	return nil
+}
+
 func (f *CloudFrontDistributionDeployment) String() string {
 	return fmt.Sprintf("ETAG %s -> ID %s", *f.eTag, *f.distributionID)
 }
