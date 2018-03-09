@@ -48,26 +48,8 @@ func ListCloudFrontDistributions(sess *session.Session) ([]Resource, error) {
 
 func (f *CloudFrontDistribution) Remove() error {
 
-	// Get Existing Configuration
-	config, err := f.svc.GetDistributionConfig(&cloudfront.GetDistributionConfigInput{
-		Id: f.ID,
-	})
-	if err != nil {
-		return err
-	}
-	distributionConfig := config.DistributionConfig
-	distributionConfig.Enabled = aws.Bool(false)
-
-	resp, err := f.svc.UpdateDistribution(&cloudfront.UpdateDistributionInput{
-		Id:                 f.ID,
-		DistributionConfig: distributionConfig,
-		IfMatch:            config.ETag,
-	})
-	if err != nil {
-		return err
-	}
-
-	err = f.svc.WaitUntilDistributionDeployed(&cloudfront.GetDistributionInput{
+	// Get Existing eTag
+	resp, err := f.svc.GetDistributionConfig(&cloudfront.GetDistributionConfigInput{
 		Id: f.ID,
 	})
 	if err != nil {
