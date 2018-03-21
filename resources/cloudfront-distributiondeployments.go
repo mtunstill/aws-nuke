@@ -13,6 +13,7 @@ type CloudFrontDistributionDeployment struct {
 	distributionID     *string
 	eTag               *string
 	distributionConfig *cloudfront.DistributionConfig
+	status             string
 }
 
 func init() {
@@ -58,6 +59,7 @@ func ListCloudFrontDistributionDeployments(sess *session.Session) ([]Resource, e
 			distributionID:     resp.Distribution.Id,
 			eTag:               resp.ETag,
 			distributionConfig: resp.Distribution.DistributionConfig,
+			status:             UnPtrString(resp.Distribution.Status, "unknown"),
 		})
 	}
 
@@ -78,12 +80,12 @@ func (f *CloudFrontDistributionDeployment) Remove() error {
 }
 
 func (f *CloudFrontDistributionDeployment) Filter() error {
-	if *f.distributionConfig.Enabled == false {
+	if *f.distributionConfig.Enabled == false && f.status != "InProgress" {
 		return fmt.Errorf("already disabled")
 	}
 	return nil
 }
 
 func (f *CloudFrontDistributionDeployment) String() string {
-	return fmt.Sprintf("ETAG %s -> ID %s", *f.eTag, *f.distributionID)
+	return *f.distributionID
 }
